@@ -3,13 +3,13 @@
 session_start();
 
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header("Location: ./login/");
-    exit;
+  header("Location: ./login/");
+  exit;
 }
 
 if ($_SESSION['role'] != 'student') {
-    header("Location: ./login/");
-    exit;
+  header("Location: ./login/");
+  exit;
 }
 
 include './config.php';
@@ -21,58 +21,41 @@ $query = new Database();
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="../favicon.ico">
-    <title>Welcome student</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-        }
-
-        .container {
-            text-align: center;
-            padding: 20px;
-            border: 1px solid #ddd;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        .logout {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            color: #fff;
-            background-color: #007bff;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-
-        .logout:hover {
-            background-color: #0056b3;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><?php echo "Hello, {$_SESSION['role']}!"; ?></title>
+  <?php include 'includes/css.php'; ?>
 </head>
 
-<body>
+<body class="hold-transition sidebar-mini">
+  <div class="wrapper">
+    <?php include 'includes/navbar.php' ?>
+    <div class="content-wrapper">
 
-    <div class="container">
-        <?php echo "<h1>Hello, {$_SESSION['role']}!</h1>"; ?>
-        <a href="../logout/" class="logout">Logout</a>
+      <?php
+      $arr = array(
+        ["title" => "Home", "url" => "./"],
+        ["title" => "Dashboard", "url" => "#"],
+      );
+      pagePath('Dashboard', $arr);
+      ?>
+
+      <section class="content">
+        <div class="container-fluid">
+
+
+          <?php echo "<h1>Hello, {$_SESSION['role']}!</h1>"; ?>
+
+        </div>
+      </section>
     </div>
 
+    <?php include 'includes/footer.php'; ?>
+  </div>
+
+  <?php include 'includes/js.php' ?>
 </body>
 
 </html>

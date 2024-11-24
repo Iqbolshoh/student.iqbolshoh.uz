@@ -26,12 +26,18 @@ if (isset($_COOKIE['username']) && isset($_COOKIE['session_token'])) {
         session_start();
     }
 
-    $result = $query->select('users', 'id, role', 'username', $_COOKIE['username'])[0];
+    $result = $query->select('users', '*', 'username', $_COOKIE['username'])[0];
 
     $_SESSION['loggedin'] = true;
     $_SESSION['username'] = $_COOKIE['username'];
     $_SESSION['user_id'] = $result['id'];
+    $_SESSION['first_name'] =  $result['first_name'];
+    $_SESSION['last_name'] =  $result['last_name'];
+    $_SESSION['birth_date'] =  $result['birth_date'];
+    $_SESSION['phone'] =  $result['phone'];
+    $_SESSION['email'] =  $result['email'];
     $_SESSION['role'] =  $result['role'];
+    $_SESSION['profile_picture'] =  $result['profile_picture'];
 
     if ($_SESSION['role'] == 'admin') {
         header("Location: ../admin/");
@@ -56,7 +62,13 @@ if (isset($_POST['submit'])) {
         $_SESSION['loggedin'] = true;
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
-        $_SESSION['role'] = $user['role'];
+        $_SESSION['first_name'] =  $user['first_name'];
+        $_SESSION['last_name'] =  $user['last_name'];
+        $_SESSION['birth_date'] =  $user['birth_date'];
+        $_SESSION['phone'] =  $user['phone'];
+        $_SESSION['email'] =  $user['email'];
+        $_SESSION['role'] =  $user['role'];
+        $_SESSION['profile_picture'] =  $user['profile_picture'];
 
         setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
         setcookie('session_token', session_id(), time() + (86400 * 30), "/", "", true, true);
