@@ -1,16 +1,17 @@
 <?php
 
-session_start();
-
-if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
-    header("Location: ../");
-    exit;
-}
-
-include '../config.php';
+include '../../config.php';
 $query = new Database();
 
 $response = ['exists' => false];
+
+if (isset($_POST['phone'])) {
+    $phone = $_POST['phone'];
+    $phone_check = $query->select('users', 'phone', 'phone = ?', [$phone], 's');
+    if ($phone_check) {
+        $response['exists'] = true;
+    }
+}
 
 if (isset($_POST['email'])) {
     $email = $_POST['email'];

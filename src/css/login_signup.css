@@ -1,3 +1,8 @@
+* {
+    margin: 0px;
+    padding: 0px;
+}
+
 body {
     height: 100vh;
     display: flex;
@@ -35,7 +40,8 @@ h1 {
     color: #555;
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
     width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
@@ -93,9 +99,14 @@ h1 {
     text-decoration: underline;
 }
 
+#phone-message,
 #email-message,
 #username-message {
     color: red;
     font-size: 14px;
     margin-top: 5px;
+}
+
+.logo-container {
+    margin-bottom: 20px;
 }

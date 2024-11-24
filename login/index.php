@@ -6,6 +6,9 @@ if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
     if ($_SESSION['role'] == 'admin') {
         header("Location: ../admin/");
         exit;
+    } else if ($_SESSION['role'] == 'teacher') {
+        header("Location: ../teacher/");
+        exit;
     } else {
         header("Location: ../");
         exit;
@@ -33,6 +36,9 @@ if (isset($_COOKIE['username']) && isset($_COOKIE['session_token'])) {
     if ($_SESSION['role'] == 'admin') {
         header("Location: ../admin/");
         exit;
+    } else if ($_SESSION['role'] == 'teacher') {
+        header("Location: ../teacher/");
+        exit;
     } else {
         header("Location: ../");
         exit;
@@ -55,10 +61,11 @@ if (isset($_POST['submit'])) {
         setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
         setcookie('session_token', session_id(), time() + (86400 * 30), "/", "", true, true);
 
-
         $redirectPath = '../';
         if ($result['role'] == 'admin') {
             $redirectPath = '../admin/';
+        } else if ($_SESSION['role'] == 'teacher') {
+            $redirectPath = "../teacher/";
         }
 ?>
         <script>
@@ -66,7 +73,7 @@ if (isset($_POST['submit'])) {
                 Swal.fire({
                     position: 'top-end',
                     icon: 'success',
-                    title: 'Login successful',
+                    title: 'Muvaffaqiyatli kirish',
                     showConfirmButton: false,
                     timer: 1500
                 }).then(() => {
@@ -82,8 +89,8 @@ if (isset($_POST['submit'])) {
                 Swal.fire({
                     position: 'top-end',
                     icon: 'error',
-                    title: 'Incorrect information',
-                    text: 'Login or password is incorrect',
+                    title: 'Noto\'g\'ri ma\'lumot',
+                    text: 'Login yoki parol noto\'g\'ri',
                     showConfirmButton: true
                 });
             };
@@ -94,30 +101,44 @@ if (isset($_POST['submit'])) {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="../favicon.ico">
-    <title>Login</title>
+    <title>Kirish</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../src/css/login_signup.css">
 </head>
+
+<style>
+    .logo-container {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .logo {
+        width: 150px;
+        height: 150px;
+        object-fit: contain;
+        border-radius: 50%;
+    }
+</style>
 
 <body>
 
     <div class="form-container">
 
-        <h1>Login</h1>
+        <h1>Kirish</h1>
 
         <form method="post" action="">
             <div class="form-group">
-                <label for="username">Username</label>
+                <label for="username">Foydalanuvchi nomi</label>
                 <input type="text" id="username" name="username" required maxlength="30">
             </div>
             <div class="form-group">
-                <label for="password">Password</label>
+                <label for="password">Parol</label>
                 <div class="password-container">
                     <input type="password" id="password" name="password" required maxlength="255">
                     <button type="button" id="toggle-password" class="password-toggle"><i
@@ -125,13 +146,9 @@ if (isset($_POST['submit'])) {
                 </div>
             </div>
             <div class="form-group">
-                <button type="submit" name="submit" id="submit">Login</button>
+                <button type="submit" name="submit" id="submit">Kirish</button>
             </div>
         </form>
-
-        <div class="text-center">
-            <p>Don't have an account? <a href="../signup/">Sign Up</a></p>
-        </div>
 
     </div>
 

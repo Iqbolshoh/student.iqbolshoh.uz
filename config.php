@@ -2,7 +2,7 @@
 define("DB_SERVER", "localhost");
 define("DB_USERNAME", "root");
 define("DB_PASSWORD", "");
-define("DB_NAME", "roles");
+define("DB_NAME", "iqbolsho_students");
 
 class Database
 {

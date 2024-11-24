@@ -2,70 +2,65 @@
 
 session_start();
 
-if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
-    header("Location: ../");
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("Location: ../../login/");
     exit;
 }
 
-include '../config.php';
-$query = new Database();
+if ($_SESSION['role'] != 'admin') {
+    header("Location: ../../login/");
+    exit;
+}
 
-$error_message = '';
+include '../../config.php';
+$query = new Database();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
+    $role = $query->validate($_POST['role']);
+    $birth_date = $query->validate($_POST['birth_date']);
+    $phone = $query->validate($_POST['phone']);
     $email = $query->validate($_POST['email']);
     $username = $query->validate($_POST['username']);
     $password = $query->hashPassword($_POST['password']);
 
-    $email_check = $query->select('users', 'email', 'email = ?', [$email], 's');
-    $username_check = $query->select('users', 'username', 'username = ?', [$username], 's');
-
-
     $data = [
         'first_name' => $first_name,
         'last_name' => $last_name,
+        'birth_date' => $birth_date,
+        'phone' => $phone,
         'email' => $email,
         'username' => $username,
-        'password' => $password
+        'password' => $password,
+        'role' => $role
     ];
 
     $result = $query->insert('users', $data);
 
     if ($result) {
-        $user_id = $query->select('users', 'id', 'username = ?', [$username], 's')[0]['id'];
-
-        $_SESSION['loggedin'] = true;
-        $_SESSION['username'] = $username;
-        $_SESSION['user_id'] = $user_id;
-        $_SESSION['role'] = 'user';
-
-        setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
-        setcookie('session_token', session_id(), time() + (86400 * 30), "/", "", true, true);
 ?>
         <script>
             window.onload = function() {
                 Swal.fire({
                     position: 'top-end',
                     icon: 'success',
-                    title: 'Registration successful',
+                    title: 'Foydalanuvchini qo\'shish muvaffaqiyatli',
                     showConfirmButton: false,
                     timer: 1500
                 }).then(() => {
-                    window.location.href = '../';
+                    window.location.href = './';
                 });
             };
         </script>
-
 <?php
     } else {
         echo "<script>
                     Swal.fire({
                         icon: 'error',
-                        title: 'Oops...',
-                        text: 'Registration failed. Please try again later.',
+                        title: 'Xato...',
+                        text: 'Foydalanuvchini qo\'shish muammosi yuz berdi. Iltimos, keyinroq qaytadan urinib ko\'ring.',
                     });
                   </script>";
     }
@@ -74,41 +69,63 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="../favicon.ico">
-    <title>Sign Up</title>
+    <link rel="icon" type="image/x-icon" href="../../favicon.ico">
+    <title>Ro'yxatdan o'tish</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="../src/css/login_signup.css">
+    <link rel="stylesheet" href="../../src/css/login_signup.css">
 </head>
+
+<style>
+    body {
+        padding: 45px 0px;
+    }
+</style>
 
 <body>
     <div class="form-container">
-        <h1>Sign Up</h1>
         <form id="signupForm" method="post" action="">
             <div class="form-group">
-                <label for="first_name">First Name</label>
+                <label for="first_name">Ism</label>
                 <input type="text" id="first_name" name="first_name" required maxlength="30">
             </div>
             <div class="form-group">
-                <label for="last_name">Last Name</label>
+                <label for="last_name">Familiya</label>
                 <input type="text" id="last_name" name="last_name" required maxlength="30">
             </div>
             <div class="form-group">
-                <label for="email">Email</label>
+                <label for="role">Roli</label>
+                <select id="role" name="role" required>
+                    <option value="student">Talaba</option>
+                    <option value="teacher">O'qituvchi</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="birth_date">Tug'ilgan sana</label>
+                <input type="date" id="birth_date" name="birth_date" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Telefon raqami</label>
+                <input type="tel" id="phone" name="phone" required oninput="formatPhoneNumber(this)" onkeydown="removeSpace(event)"
+                    maxlength="17" required value="+998 ">
+                <p id="phone-message"></p>
+            </div>
+            <div class="form-group">
+                <label for="email">Elektron pochta</label>
                 <input type="email" id="email" name="email" required maxlength="100">
                 <p id="email-message"></p>
             </div>
             <div class="form-group">
-                <label for="username">Username</label>
+                <label for="username">Foydalanuvchi nomi</label>
                 <input type="text" id="username" name="username" required maxlength="30">
                 <p id="username-message"></p>
             </div>
             <div class="form-group">
-                <label for="password">Password</label>
+                <label for="password">Parol</label>
                 <div class="password-container">
                     <input type="password" id="password" name="password" required maxlength="255">
                     <button type="button" id="toggle-password" class="password-toggle"><i
@@ -116,20 +133,58 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
             <div class="form-group">
-                <button type="submit" id="submit">Sign Up</button>
+                <button type="submit" id="submit">Foydalanuvchini qo'shish</button>
             </div>
         </form>
-        <div class="text-center">
-            <p>Already have an account? <a href="../login/">Login</a></p>
-        </div>
     </div>
 
-
-    <script src="../src/js/sweetalert2.js"></script>
+    <script src="../../src/js/sweetalert2.js"></script>
 
     <script>
+        let isphoneAvailable = false;
         let isEmailAvailable = false;
         let isUsernameAvailable = false;
+
+        function formatPhoneNumber(input) {
+            let phoneNumber = input.value.replace(/\D/g, '');
+
+            if (phoneNumber.length > 0) {
+                phoneNumber = '+998 ' + phoneNumber.substring(3, 5) + ' ' + phoneNumber.substring(5, 8) + ' ' + phoneNumber.substring(8, 10) + ' ' + phoneNumber.substring(10, 12);
+            }
+
+            input.value = phoneNumber;
+        }
+
+        function removeSpace(event) {
+            let input = event.target;
+            if (event.key === 'Backspace' || event.key === 'Delete') {
+                input.value = input.value.replace(/\s/g, '');
+            }
+        }
+
+        document.getElementById('phone').addEventListener('input', function() {
+            let phone = this.value;
+            if (phone.length > 0) {
+                fetch('check_availability.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `phone=${encodeURIComponent(phone)}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const messageElement = document.getElementById('phone-message');
+                        if (data.exists) {
+                            messageElement.textContent = 'Bu telefon raqam mavjud!';
+                            isphoneAvailable = false;
+                        } else {
+                            messageElement.textContent = '';
+                            isphoneAvailable = true;
+                        }
+                    });
+            }
+        });
 
         document.getElementById('email').addEventListener('input', function() {
             let email = this.value;
@@ -145,7 +200,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     .then(data => {
                         const messageElement = document.getElementById('email-message');
                         if (data.exists) {
-                            messageElement.textContent = 'This an email exists!';
+                            messageElement.textContent = 'Bu elektron pochta mavjud!';
                             isEmailAvailable = false;
                         } else {
                             messageElement.textContent = '';
@@ -165,13 +220,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             const messageElement = document.getElementById('email-message');
 
             if (!validateEmailFormat(email)) {
-                messageElement.textContent = 'Email format is incorrect!';
+                messageElement.textContent = 'Elektron pochta formati noto\'g\'ri!';
                 event.preventDefault();
                 return;
             }
 
             if (isEmailAvailable === false) {
-                messageElement.textContent = 'This an email exists!';
+                messageElement.textContent = 'Bu elektron pochta mavjud!';
                 event.preventDefault();
             }
         });
@@ -191,7 +246,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     .then(data => {
                         const messageElement = document.getElementById('username-message');
                         if (data.exists) {
-                            messageElement.textContent = 'This a username exists!';
+                            messageElement.textContent = 'Bu foydalanuvchi nomi mavjud!';
                             isUsernameAvailable = false;
                         } else {
                             messageElement.textContent = '';
