@@ -38,10 +38,10 @@ function pagePath($pageTitle, $breadcrumb)
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="./" class="nav-link">Home</a>
+            <a href="./" class="nav-link">Asosiy</a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-            <a class="nav-link">Contact</a>
+            <a class="nav-link" onclick="logout()">Chiqish</a>
         </li>
     </ul>
 
@@ -119,11 +119,48 @@ function pagePath($pageTitle, $breadcrumb)
                     </ul>
                 </li>
 
-                <li class="nav-header">EXAMPLES</li>
+                <li class="nav-header">BOSHQA</li>
+
+                <li class="nav-item has-treeview menu-open">
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="logout()">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <p>Chiqish</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
 
             </ul>
         </nav>
         <!-- /.sidebar-menu -->
     </div>
     <!-- /.sidebar -->
+
 </aside>
+
+<script>
+    function logout() {
+        Swal.fire({
+            title: 'Aniq chiqmoqchimisiz?',
+            text: 'Siz bu amalni bekor qilolmaysiz!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ha, chiqaman!',
+            cancelButtonText: 'Bekor qilish'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire(
+                    'Chiqildi!',
+                    'Siz tizimdan muvaffaqiyatli chiqdingiz.',
+                    'success'
+                ).then(() => {
+                    window.location.href = '../logout/';
+                });
+            }
+        });
+    }
+</script>
